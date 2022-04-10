@@ -1,7 +1,7 @@
 import React from "react";
 import toast, { Toaster, ToastBar } from "react-hot-toast";
+import { IconButton } from "@mui/material";
 
-import { IconButton } from "@elements";
 import { CloseIcon } from "@icons";
 
 export function Notifications() {

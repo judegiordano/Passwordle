@@ -38,8 +38,8 @@
       "@services/*": [
         "src/services/*"
       ],
-      "@elements": [
-        "src/elements"
+      "@elements/*": [
+        "src/elements/*"
       ],
       "@icons": [
         "src/elements/icons"

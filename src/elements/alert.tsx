@@ -2,20 +2,21 @@ import React from "react";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
-import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
-
-import { Divider, Button } from "@elements";
+import Divider from "@mui/material/Divider";
+import Button from "@mui/material/Button";
 
 interface IAlertProps {
 	open: boolean
-	hash: string
+	title: string
+	children: React.ReactNode
 	handleClose: () => void
 }
 
 export function Alert({
 	open,
-	hash,
+	title,
+	children,
 	handleClose
 }: IAlertProps) {
 	return (
@@ -25,16 +26,13 @@ export function Alert({
 				aria-labelledby="responsive-dialog-title"
 			>
 				<DialogTitle id="responsive-dialog-title">
-					{"Congratulations! Todays Password Was:"}
+					{title}
 				</DialogTitle>
 				<DialogContent>
-					<DialogContentText className="break-words">
-						<b>{hash}</b>
-					</DialogContentText>
+					{children}
 				</DialogContent>
 				<Divider />
 				<DialogActions>
-
 					<Button onClick={handleClose} autoFocus>
 						done
 					</Button>

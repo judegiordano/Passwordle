@@ -1,13 +1,21 @@
 import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
+import InputAdornment from "@mui/material/InputAdornment";
+import Input from "@mui/material/Input";
+import InputLabel from "@mui/material/InputLabel";
+import FormControl from "@mui/material/FormControl";
+import Card from "@mui/material/Card";
+import CardContent from "@mui/material/CardContent";
+import Button from "@mui/material/Button";
+import { DialogContentText } from "@mui/material";
 
-import { Input, InputLabel, FormControl, Card, CardContent, Button } from "@elements";
 import { ReCaptcha } from "@components/captcha";
 import { useStorageStore, Storage } from "@store/useStorage";
 import { useLogin } from "@hooks/useLogin";
 import { BuildScore } from "@components/buildScore";
-import { Alert } from "@components/alert";
+import { Alert } from "@elements/alert";
 import { MAX_TRIES } from "@services/config";
+import { Spinner } from "@elements/spinner";
 
 function Home() {
 	const { isLoading, recaptchaRef, handleLogin } = useLogin();
@@ -91,6 +99,11 @@ function Home() {
 									id="filled-adornment-password"
 									type="password"
 									autoComplete="off"
+									endAdornment={
+										<InputAdornment position="end">
+											<Spinner visible={isLoading} size={25} />
+										</InputAdornment>
+									}
 								/>
 							</FormControl>
 						</div>
@@ -113,10 +126,14 @@ function Home() {
 					</CardContent>
 				</Card>
 				<Alert
+					title="Congratulations! Todays Password Was:"
 					open={alertOpen}
-					hash={memory.hash}
 					handleClose={() => setAlertOpen(false)}
-				/>
+				>
+					<DialogContentText className="break-words">
+						<b>{memory.hash}</b>
+					</DialogContentText>
+				</Alert>
 				<ReCaptcha recaptchaRef={recaptchaRef} />
 			</div>
 			<BuildScore guesses={memory.guesses} />

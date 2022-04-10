@@ -1,6 +1,6 @@
 import React from "react";
+import Divider from "@mui/material/Divider";
 
-import { Divider } from "@elements";
 import { Circle, CircleType } from "./circle";
 
 interface IBuildScoreProps {
