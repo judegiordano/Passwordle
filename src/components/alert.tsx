@@ -7,15 +7,17 @@ import DialogTitle from "@mui/material/DialogTitle";
 
 import { Divider, Button } from "@elements";
 
+interface IAlertProps {
+	open: boolean
+	hash: string
+	handleClose: () => void
+}
+
 export function Alert({
 	open,
 	hash,
 	handleClose
-}: {
-	open: boolean
-	hash: string
-	handleClose: () => void
-}) {
+}: IAlertProps) {
 	return (
 		<>
 			<Dialog
@@ -32,6 +34,7 @@ export function Alert({
 				</DialogContent>
 				<Divider />
 				<DialogActions>
+
 					<Button onClick={handleClose} autoFocus>
 						done
 					</Button>
