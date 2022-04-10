@@ -15,6 +15,7 @@ export function useLogin() {
 		const body = JSON.stringify({ token, password });
 		const response = await fetch(`${NEXT_PUBLIC_DOMAIN}/api/login`, { method: "POST", body });
 		const data = await response.json();
+		setIsLoading(false);
 		return data as {
 			ok: boolean,
 			error?: string | null,

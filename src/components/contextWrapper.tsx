@@ -3,31 +3,22 @@ import { SWRConfig } from "swr";
 
 import { Notifications } from "@services/notifications";
 import { useDayStore } from "@store/useDay";
-import { useAuthStore } from "@store/useAuth";
-import { useGuessesStore } from "@store/useGuesses";
-import { useSettingsStore } from "@store/useSettings";
+import { useStorageStore } from "@store/useStorage";
 
 const provider = ((cache) => () => cache)(new Map());
 const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
 export function ContextWrapper({ children }: { children: React.ReactNode }) {
 	const { dayCache, updateDayCache } = useDayStore();
-	const { clearSettingsCache } = useSettingsStore();
-	const { clearAuthCache } = useAuthStore();
-	const { clearGuessesCache } = useGuessesStore();
-	const resetLocalStorage = () => {
-		clearSettingsCache();
-		clearAuthCache();
-		clearGuessesCache();
-	};
+	const { clearStorageCache } = useStorageStore();
 	useEffect(() => {
 		const todayIndex = new Date().getDay();
 		if (!dayCache) {
-			resetLocalStorage();
+			clearStorageCache();
 			return updateDayCache(days[todayIndex]);
 		}
 		if(dayCache === days[todayIndex]) return;
-		resetLocalStorage();
+		clearStorageCache();
 		updateDayCache(days[todayIndex]);
 		window.location.reload();
 	}, [dayCache]);

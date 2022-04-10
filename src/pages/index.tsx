@@ -2,69 +2,71 @@ import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 
 import { Input, InputLabel, FormControl, Card, CardContent, Button } from "@elements";
-import { CircleType } from "@components/circle";
 import { ReCaptcha } from "@components/captcha";
-import { useSettingsStore, Settings } from "@store/useSettings";
-import { useGuessesStore, Guesses } from "@store/useGuesses";
-import { useAuthStore, Auth } from "@store/useAuth";
+import { useStorageStore, Storage } from "@store/useStorage";
 import { useLogin } from "@hooks/useLogin";
-
 import { BuildScore } from "@components/buildScore";
 import { Alert } from "@components/alert";
 import { MAX_TRIES } from "@services/config";
 
 function Home() {
-	const { isLoading, recaptchaRef, setIsLoading, handleLogin } = useLogin();
-	const { settingsCache, updateSettingsCache } = useSettingsStore();
-	const { guessesCache, updateGuessesCache } = useGuessesStore();
-	const { authCache, updateAuthCache } = useAuthStore();
+	const { isLoading, recaptchaRef, handleLogin } = useLogin();
+	const { storageCache, updateStorageCache } = useStorageStore();
+	const [memory, setMemory] = useState<Storage>({
+		password: "",
+		hash: "",
+		attempts: 0,
+		guesses: [[]],
+		loggedIn: false
+	});
 	const [alertOpen, setAlertOpen] = useState(false);
-	const [guesses, setGuesses] = useState<Guesses[][]>([[]]);
-	const [settings, setSettings] = useState<Settings>({ password: "", hash: "" });
-	const [auth, setAuth] = useState<Auth>();
 
-	const sync = (
-		values: Settings,
-		loading: boolean,
-		openAlert = false,
-		positions?: { type: CircleType }[]
-	) => {
-		setSettings(values);
-		updateSettingsCache(values);
-		setIsLoading(loading);
-		setAlertOpen(openAlert);
-		if (positions) {
-			guessesCache.push(positions);
-			updateGuessesCache(guessesCache);
-		}
-	};
 	const handleSubmit = async () => {
-		const response = await handleLogin(settings.password);
+		const response = await handleLogin(memory.password);
 		if (!response.ok || !response.data) {
 			toast.error(response.error ?? "internal server error");
-			sync({ ...settings, password: "", hash: "" }, false);
+			updateStorageCache({
+				...storageCache,
+				password: "",
+				hash: "",
+				loggedIn: false
+			});
 			return;
 		}
-		const {correct, hash, positions } = response.data;
+		const { correct, hash, positions } = response.data;
 		if (!correct && positions) {
 			toast.error("incorrect password");
-			sync({ ...settings, password: "", hash: "" }, false, false, positions);
-			updateAuthCache({...authCache, attempts: authCache.attempts += 1 });
+			memory.guesses.push(positions);
+			updateStorageCache({
+				...storageCache,
+				password: "",
+				hash: "",
+				loggedIn: false,
+				attempts: storageCache.attempts += 1,
+				guesses: memory.guesses
+			});
 			return;
 		}
-		sync({ ...settings, password: "", hash }, false, true, positions );
-		updateAuthCache({...authCache, attempts: authCache.attempts += 1 });
+		memory.guesses.push(positions);
+		updateStorageCache({
+			...storageCache,
+			password: memory.password,
+			hash,
+			loggedIn: true,
+			attempts: storageCache.attempts += 1,
+			guesses: memory.guesses
+		});
+		setAlertOpen(true);
 	};
+
 	useEffect(() => {
-		setSettings(settingsCache);
-		setGuesses(guessesCache);
-		setAuth(authCache);
-	}, [settingsCache, guessesCache, authCache]);
+		setMemory(storageCache);
+	}, [storageCache]);
 
 	return (
 		<>
 			<div className="max-w-md p-3 m-auto">
-				Attempts: {auth?.attempts}
+				Attempts: {memory.attempts}
 			</div>
 			<div className="max-w-md p-3 m-auto">
 				<Card>
@@ -73,15 +75,19 @@ function Home() {
 							<FormControl>
 								<InputLabel
 									htmlFor="filled-adornment-password">
-									{`Password ${settings.password.length ?? 0}/10`}
+									{`Password ${memory.password.length ?? 0}/10`}
 								</InputLabel>
 								<Input
-									disabled={isLoading || (auth?.attempts && auth.attempts >= MAX_TRIES) || false}
-									value={settings.password}
+									disabled={
+										isLoading ||
+										memory.attempts >= MAX_TRIES ||
+										memory.loggedIn
+									}
+									value={memory.password}
 									fullWidth
 									className="max-w-[250px] text-1xl"
 									inputProps={{ maxLength: 10 }}
-									onChange={(e) => sync({ ...settings, password: e.target.value }, false)}
+									onChange={(e) => updateStorageCache({ ...storageCache, password: e.target.value })}
 									id="filled-adornment-password"
 									type="password"
 									autoComplete="off"
@@ -90,7 +96,12 @@ function Home() {
 						</div>
 						<div className="text-center">
 							<Button
-								disabled={settings.password.length < 10 || isLoading}
+								disabled={
+									memory.password.length < 10 ||
+									isLoading ||
+									memory.attempts >= MAX_TRIES ||
+									memory.loggedIn
+								}
 								fullWidth
 								className="max-w-[250px]"
 								variant="outlined"
@@ -103,12 +114,12 @@ function Home() {
 				</Card>
 				<Alert
 					open={alertOpen}
-					hash={settings.hash}
+					hash={memory.hash}
 					handleClose={() => setAlertOpen(false)}
 				/>
 				<ReCaptcha recaptchaRef={recaptchaRef} />
 			</div>
-			<BuildScore guesses={guesses} />
+			<BuildScore guesses={memory.guesses} />
 		</>
 	);
 }
