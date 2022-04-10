@@ -2,6 +2,8 @@
 import create from "zustand";
 import { persist } from "zustand/middleware";
 
+import { storageEngine } from "./engine";
+
 export type Settings = { password: string, hash: string }
 
 type UseSettingsState = {
@@ -19,7 +21,7 @@ export const useSettingsStore = create<UseSettingsState>(
 		}),
 		{
 			name: "passwordle-game.user-settings",
-			getStorage: () => localStorage,
+			getStorage: storageEngine,
 			version: 1
 		}
 	)

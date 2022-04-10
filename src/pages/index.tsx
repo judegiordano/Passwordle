@@ -11,6 +11,7 @@ import { useLogin } from "@hooks/useLogin";
 
 import { BuildScore } from "@components/buildScore";
 import { Alert } from "@components/alert";
+import { MAX_TRIES } from "@services/config";
 
 function Home() {
 	const { isLoading, recaptchaRef, setIsLoading, handleLogin } = useLogin();
@@ -75,7 +76,7 @@ function Home() {
 									{`Password ${settings.password.length ?? 0}/10`}
 								</InputLabel>
 								<Input
-									disabled={isLoading || (auth?.attempts && auth?.attempts >= 10) || false}
+									disabled={isLoading || (auth?.attempts && auth.attempts >= MAX_TRIES) || false}
 									value={settings.password}
 									fullWidth
 									className="max-w-[250px] text-1xl"

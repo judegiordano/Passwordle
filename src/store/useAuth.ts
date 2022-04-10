@@ -2,6 +2,8 @@
 import create from "zustand";
 import { persist } from "zustand/middleware";
 
+import { storageEngine } from "./engine";
+
 export type Auth = { password: string, attempts: number, loggedIn: boolean }
 
 type UseAuthState = {
@@ -19,7 +21,7 @@ export const useAuthStore = create<UseAuthState>(
 		}),
 		{
 			name: "passwordle-game.auth",
-			getStorage: () => localStorage,
+			getStorage: storageEngine,
 			version: 1
 		}
 	)

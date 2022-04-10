@@ -3,6 +3,7 @@ import create from "zustand";
 import { persist } from "zustand/middleware";
 
 import { CircleType } from "@components/circle";
+import { storageEngine } from "./engine";
 
 export type Guesses = { type: CircleType }
 
@@ -21,7 +22,7 @@ export const useGuessesStore = create<UseGuesses>(
 		}),
 		{
 			name: "passwordle-game.guesses",
-			getStorage: () => localStorage,
+			getStorage: storageEngine,
 			version: 1
 		}
 	)
