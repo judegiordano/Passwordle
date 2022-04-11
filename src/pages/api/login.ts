@@ -26,7 +26,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
 				data: {
 					correct: true,
 					hash: hash(password),
-					password,
+					password: "",
 					positions: Array.from({ length: lookup.length }).map(() => {
 						return { type: CircleType.correct };
 					})
@@ -44,7 +44,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
 			data: {
 				correct: false,
 				hash: (attempt + 1) >= 10 ? hash(password) : "",
-				password: (attempt + 1) >= 10 ? password : "",
+				password: "",
 				positions
 			}
 		});

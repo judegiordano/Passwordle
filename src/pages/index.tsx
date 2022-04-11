@@ -125,18 +125,8 @@ function Home() {
 				</Card>
 			</div>
 			<StatsScreen
-				title="Congratulations! Today's Password Was:"
-				open={memory.loggedIn}
-			>
-				<DialogContentText className="break-words">
-					<b>{memory.hash}</b>
-					<br />
-					<b>({memory.password})</b>
-				</DialogContentText>
-			</StatsScreen>
-			<StatsScreen
-				title="Too Bad! Today's Password Was"
-				open={memory.attempts >= MAX_TRIES && !memory.loggedIn}
+				title={`${memory.loggedIn ? "Congratulations!" : "Too Bad!"} Today's Password Was:`}
+				open={memory.attempts >= MAX_TRIES || memory.loggedIn}
 			>
 				<DialogContentText className="break-words">
 					<b>{memory.hash}</b>
