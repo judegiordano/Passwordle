@@ -16,6 +16,7 @@ import { BuildScore } from "@components/buildScore";
 import { MAX_TRIES, PASSWORD_LENGTH } from "@services/config";
 import { Spinner } from "@elements/spinner";
 import { StatsScreen } from "@components/statsScreen";
+import { LivesCounter } from "@components/livesCounter";
 
 function Home() {
 	const { isLoading, recaptchaRef, handleLogin } = useLogin();
@@ -77,9 +78,7 @@ function Home() {
 
 	return (
 		<>
-			<div className="max-w-md p-3 m-auto">
-				Attempts: {memory.attempts} / {MAX_TRIES}
-			</div>
+			<LivesCounter />
 			<div className="max-w-md p-3 m-auto">
 				<Card>
 					<CardContent>
