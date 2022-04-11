@@ -140,12 +140,9 @@ function Home() {
 			>
 				<DialogContentText className="break-words">
 					<b>{memory.hash}</b>
-					<br />
-					<b>({memory.password})</b>
 				</DialogContentText>
 			</StatsScreen>
 			<ReCaptcha recaptchaRef={recaptchaRef} />
-
 			<BuildScore guesses={memory.guesses} />
 		</>
 	);
