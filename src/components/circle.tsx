@@ -2,11 +2,7 @@ import React from "react";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 
-export enum CircleType {
-	correct,
-	incorrect,
-	wrong_position
-}
+import { CircleType } from "@types";
 
 interface ICircleProps {
 	type: CircleType

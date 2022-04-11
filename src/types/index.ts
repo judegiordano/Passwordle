@@ -4,6 +4,15 @@ export enum CircleType {
 	wrong_position
 }
 
+export enum HttpMethod {
+	GET = "GET",
+	POST = "POST",
+	PATCH = "PATCH",
+	PUT = "PUT",
+	DELETE = "DELETE",
+	OPTIONS = "OPTIONS"
+}
+
 export type Guesses = { type: CircleType }
 
 export interface IApiResponse {

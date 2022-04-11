@@ -1,7 +1,8 @@
 import React from "react";
 import Divider from "@mui/material/Divider";
 
-import { Circle, CircleType } from "./circle";
+import { Circle } from "./circle";
+import { CircleType } from "@types";
 
 interface IBuildScoreProps {
 	guesses: { type: CircleType }[][]

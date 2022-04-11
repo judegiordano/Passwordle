@@ -1,7 +1,7 @@
 import { useRef, useState } from "react";
 import ReCAPTCHA from "react-google-recaptcha";
 
-import { NEXT_PUBLIC_DOMAIN } from "@services/config";
+import { Rest } from "@services/rest";
 import { IApiResponse } from "@types";
 
 export function useLogin() {
@@ -12,9 +12,7 @@ export function useLogin() {
 		setIsLoading(true);
 		const token = await recaptchaRef.current?.executeAsync();
 		recaptchaRef.current?.reset();
-		const body = JSON.stringify({ token, password, attempt });
-		const response = await fetch(`${NEXT_PUBLIC_DOMAIN}/api/login`, { method: "POST", body });
-		const data = await response.json();
+		const data = await Rest.Post("login", { token, password, attempt });
 		setIsLoading(false);
 		return data;
 	}
