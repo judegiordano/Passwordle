@@ -13,7 +13,7 @@ import { ReCaptcha } from "@components/captcha";
 import { useStorageStore, Storage } from "@store/useStorage";
 import { useLogin } from "@hooks/useLogin";
 import { BuildScore } from "@components/buildScore";
-import { MAX_TRIES } from "@services/config";
+import { MAX_TRIES, PASSWORD_LENGTH } from "@services/config";
 import { Spinner } from "@elements/spinner";
 import { StatsScreen } from "@components/statsScreen";
 
@@ -64,6 +64,12 @@ function Home() {
 			guesses: memory.guesses
 		});
 	};
+	const enterListener = async (event: React.KeyboardEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+		if (memory.password.length < PASSWORD_LENGTH || isLoading || memory.attempts >= MAX_TRIES || memory.loggedIn) return;
+		if (event.code !== "Enter" && event.code !== "NumpadEnter") return;
+		event.preventDefault();
+		await handleSubmit();
+	};
 
 	useEffect(() => {
 		setMemory(storageCache);
@@ -72,7 +78,7 @@ function Home() {
 	return (
 		<>
 			<div className="max-w-md p-3 m-auto">
-				Attempts: {memory.attempts}
+				Attempts: {memory.attempts} / {MAX_TRIES}
 			</div>
 			<div className="max-w-md p-3 m-auto">
 				<Card>
@@ -81,7 +87,7 @@ function Home() {
 							<FormControl>
 								<InputLabel
 									htmlFor="filled-adornment-password">
-									{`Password ${memory.password.length ?? 0}/10`}
+									{`Password ${memory.password.length ?? 0}/${PASSWORD_LENGTH}`}
 								</InputLabel>
 								<Input
 									disabled={
@@ -92,8 +98,9 @@ function Home() {
 									value={memory.password}
 									fullWidth
 									className="max-w-[250px] text-1xl"
-									inputProps={{ maxLength: 10 }}
-									onChange={(e) => updateStorageCache({ ...storageCache, password: e.target.value })}
+									inputProps={{ maxLength: PASSWORD_LENGTH }}
+									onChange={e => updateStorageCache({ ...storageCache, password: e.target.value })}
+									onKeyDown={async e => await enterListener(e)}
 									id="filled-adornment-password"
 									type="password"
 									autoComplete="off"
@@ -113,6 +120,7 @@ function Home() {
 									memory.attempts >= MAX_TRIES ||
 									memory.loggedIn
 								}
+								type="submit"
 								fullWidth
 								className="max-w-[250px]"
 								variant="outlined"
