@@ -13,9 +13,9 @@ import { ReCaptcha } from "@components/captcha";
 import { useStorageStore, Storage } from "@store/useStorage";
 import { useLogin } from "@hooks/useLogin";
 import { BuildScore } from "@components/buildScore";
-import { Alert } from "@elements/alert";
 import { MAX_TRIES } from "@services/config";
 import { Spinner } from "@elements/spinner";
+import { StatsScreen } from "@components/statsScreen";
 
 function Home() {
 	const { isLoading, recaptchaRef, handleLogin } = useLogin();
@@ -27,10 +27,9 @@ function Home() {
 		guesses: [[]],
 		loggedIn: false
 	});
-	const [alertOpen, setAlertOpen] = useState(false);
 
 	const handleSubmit = async () => {
-		const response = await handleLogin(memory.password);
+		const response = await handleLogin(memory.password, memory.attempts);
 		if (!response.ok || !response.data) {
 			toast.error(response.error ?? "internal server error");
 			updateStorageCache({
@@ -41,14 +40,14 @@ function Home() {
 			});
 			return;
 		}
-		const { correct, hash, positions } = response.data;
+		const { correct, hash, positions, password } = response.data;
 		if (!correct && positions) {
 			toast.error("incorrect password");
 			memory.guesses.push(positions);
 			updateStorageCache({
 				...storageCache,
-				password: "",
-				hash: "",
+				password,
+				hash,
 				loggedIn: false,
 				attempts: storageCache.attempts += 1,
 				guesses: memory.guesses
@@ -58,13 +57,12 @@ function Home() {
 		memory.guesses.push(positions);
 		updateStorageCache({
 			...storageCache,
-			password: memory.password,
+			password,
 			hash,
 			loggedIn: true,
 			attempts: storageCache.attempts += 1,
 			guesses: memory.guesses
 		});
-		setAlertOpen(true);
 	};
 
 	useEffect(() => {
@@ -125,17 +123,29 @@ function Home() {
 						</div>
 					</CardContent>
 				</Card>
-				<Alert
-					title="Congratulations! Todays Password Was:"
-					open={alertOpen}
-					handleClose={() => setAlertOpen(false)}
-				>
-					<DialogContentText className="break-words">
-						<b>{memory.hash}</b>
-					</DialogContentText>
-				</Alert>
-				<ReCaptcha recaptchaRef={recaptchaRef} />
 			</div>
+			<StatsScreen
+				title="Congratulations! Todays Password Was:"
+				open={memory.loggedIn}
+			>
+				<DialogContentText className="break-words">
+					<b>{memory.hash}</b>
+					<br />
+					<b>({memory.password})</b>
+				</DialogContentText>
+			</StatsScreen>
+			<StatsScreen
+				title="Too Bad! Todays Password Was"
+				open={memory.attempts >= MAX_TRIES && !memory.loggedIn}
+			>
+				<DialogContentText className="break-words">
+					<b>{memory.hash}</b>
+					<br />
+					<b>({memory.password})</b>
+				</DialogContentText>
+			</StatsScreen>
+			<ReCaptcha recaptchaRef={recaptchaRef} />
+
 			<BuildScore guesses={memory.guesses} />
 		</>
 	);

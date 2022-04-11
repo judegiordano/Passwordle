@@ -2,10 +2,8 @@
 import create from "zustand";
 import { persist } from "zustand/middleware";
 
-import { CircleType } from "@components/circle";
 import { storageEngine } from "./engine";
-
-export type Guesses = { type: CircleType }
+import { Guesses } from "@types";
 
 export type Storage = {
 	password: string

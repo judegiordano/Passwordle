@@ -2,12 +2,7 @@ import { NextApiRequest, NextApiResponse } from "next";
 
 import { RECAPTCHA_SITE_SECRET } from "@services/config";
 import { hash, getPassword } from "@services/password";
-
-enum CircleType {
-	correct,
-	incorrect,
-	wrong_position
-}
+import { CircleType } from "@types";
 
 async function validateCaptcha(token: string) {
 	const response = await fetch(`https://www.google.com/recaptcha/api/siteverify?secret=${RECAPTCHA_SITE_SECRET}&response=${token}`, { method: "POST" });
@@ -18,7 +13,7 @@ async function validateCaptcha(token: string) {
 export default async (req: NextApiRequest, res: NextApiResponse) => {
 	try {
 		if (req.method != "POST") throw "method not allowed";
-		const { token, password: guess } = JSON.parse(req.body) as { token: string, password: string };
+		const { token, password: guess, attempt } = JSON.parse(req.body) as { token: string, password: string, attempt: number };
 		if (!token) throw "recaptcha token missing";
 		if (!guess) throw "no guess found";
 		const response = await validateCaptcha(token);
@@ -31,6 +26,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
 				data: {
 					correct: true,
 					hash: hash(password),
+					password,
 					positions: Array.from({ length: lookup.length }).map(() => {
 						return { type: CircleType.correct };
 					})
@@ -43,16 +39,17 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
 			else acc.push({ type: CircleType.incorrect });
 			return acc;
 		}, [] as { type: CircleType }[]);
-		res.status(200).json({
+		return res.status(200).json({
 			ok: true,
 			data: {
 				correct: false,
-				hash: null,
+				hash: (attempt + 1) >= 10 ? hash(password) : "",
+				password: (attempt + 1) >= 10 ? password : "",
 				positions
 			}
 		});
 	} catch (error) {
-		res.status(500).json({
+		return res.status(500).json({
 			ok: false,
 			error
 		});
