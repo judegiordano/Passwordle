@@ -9,7 +9,7 @@ import { useStorageStore } from "@store/useStorage";
 import { useTimeStampStore } from "@store/useTimestamp";
 import { BuildScore } from "@components/buildScore";
 import { CircleType, Guesses } from "@types";
-import { NEXT_PUBLIC_DOMAIN, BROWSER, DEVICE, WEB_SHARE_API_DEVICE_TYPES } from "@services/config";
+import { NEXT_PUBLIC_DOMAIN } from "@services/config";
 
 interface IStatsProps {
 	open: boolean
@@ -21,16 +21,6 @@ const emojiLookup = {
 	[CircleType.correct]: "🟩",
 	[CircleType.wrong_position]: "🟨",
 	[CircleType.incorrect]: "🟥"
-};
-
-const attemptShare = (shareData: object) => {
-	return (
-		BROWSER.name?.toUpperCase().indexOf("FIREFOX") === -1 &&
-		WEB_SHARE_API_DEVICE_TYPES.indexOf(DEVICE.type ?? "") !== -1 &&
-		navigator.canShare &&
-		navigator.canShare(shareData) &&
-		navigator.share
-	);
 };
 
 export function StatsScreen({
@@ -58,10 +48,7 @@ export function StatsScreen({
 			}).join("");
 			const title = `Passwordle for ${new Date(time).toLocaleDateString()}`;
 			const data = `${title}\n${NEXT_PUBLIC_DOMAIN}\n${score}`;
-			if (attemptShare({ text: data })) {
-				navigator.share({ text: data });
-				return toast.success("score copied!");
-			}
+			navigator.share?.({ text: data });
 			navigator.clipboard.writeText(data);
 			toast.success("score copied!");
 		} catch (error) {
