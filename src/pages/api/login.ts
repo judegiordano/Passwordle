@@ -20,7 +20,6 @@ function validateGuess(guess: string, lookup: PasswordLookup) {
 		if (match.length === 1) {
 			if (match[0] === index) acc.push({ type: CircleType.correct });
 			else acc.push({ type: CircleType.wrong_position });
-			delete lookup[letter];
 			return acc;
 		}
 		if (match[0] === index) {

@@ -11,11 +11,8 @@ export function hash(password: string) {
 function buildLookup(password: string) {
 	return password.split("").reduce((acc, letter, index) => {
 		const exists = acc[letter];
-		if (exists) {
-			acc[letter].push(index);
-			return acc;
-		}
-		acc[letter] = [index];
+		if (exists) acc[letter].push(index);
+		else acc[letter] = [index];
 		return acc;
 	}, {} as PasswordLookup);
 }

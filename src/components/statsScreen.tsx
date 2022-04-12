@@ -1,8 +1,12 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Dialog from "@mui/material/Dialog";
 import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
-import { Divider } from "@mui/material";
+import { Button, DialogActions, Divider } from "@mui/material";
+
+import { useStorageStore } from "@store/useStorage";
+import { BuildScore } from "@components/buildScore";
+import { Guesses } from "@types";
 
 interface IStatsProps {
 	open: boolean
@@ -15,6 +19,13 @@ export function StatsScreen({
 	title,
 	children,
 }: IStatsProps) {
+	const { storageCache } = useStorageStore();
+	const [guesses, setGuesses] = useState<Guesses[][]>([[]]);
+
+	useEffect(() => {
+		setGuesses(storageCache.guesses);
+	}, []);
+
 	return (
 		<>
 			<Dialog
@@ -27,7 +38,14 @@ export function StatsScreen({
 				<Divider />
 				<DialogContent>
 					{children}
+					<BuildScore guesses={guesses} />
 				</DialogContent>
+				<Divider />
+				<DialogActions>
+					<Button autoFocus>
+						share
+					</Button>
+				</DialogActions>
 			</Dialog>
 		</>
 	);
