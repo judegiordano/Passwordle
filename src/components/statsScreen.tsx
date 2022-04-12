@@ -46,8 +46,7 @@ export function StatsScreen({
 			return `${line}\n`;
 		}).join("");
 		const title = `Passwordle for ${new Date(time).toLocaleDateString()}`;
-		const footer = `${NEXT_PUBLIC_DOMAIN}`;
-		const data = `${title}\n${score}\n${footer}`;
+		const data = `${title}\n${NEXT_PUBLIC_DOMAIN}\n${score}`;
 		await navigator.clipboard.writeText(data);
 		toast.success("score copied!");
 	};
