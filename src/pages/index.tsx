@@ -41,26 +41,13 @@ function Home() {
 			});
 			return;
 		}
-		const { correct, hash, positions, password } = response.data;
-		if (!correct && positions) {
-			toast.error("incorrect password");
-			memory.guesses.push(positions);
-			updateStorageCache({
-				...storageCache,
-				password,
-				hash,
-				loggedIn: false,
-				attempts: storageCache.attempts += 1,
-				guesses: memory.guesses
-			});
-			return;
-		}
+		const { correct, positions } = response.data;
 		memory.guesses.push(positions);
+		if (!correct) toast.error("incorrect password");
 		updateStorageCache({
 			...storageCache,
-			password,
-			hash,
-			loggedIn: true,
+			...response.data,
+			loggedIn: correct,
 			attempts: storageCache.attempts += 1,
 			guesses: memory.guesses
 		});

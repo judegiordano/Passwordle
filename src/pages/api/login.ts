@@ -1,10 +1,8 @@
 import { NextApiRequest, NextApiResponse } from "next";
 
-import { RECAPTCHA_SITE_SECRET } from "@services/config";
+import { PASSWORD_LENGTH, RECAPTCHA_SITE_SECRET } from "@services/config";
 import { hash, getPassword } from "@services/password";
-import { CircleType, Guesses, HttpMethod } from "@types";
-
-type RequestBody = { token: string, password: string, attempt: number };
+import { CircleType, Guesses, HttpMethod, RequestBody, PasswordLookup } from "@types";
 
 async function validateCaptcha(token: string) {
 	const response = await fetch(`https://www.google.com/recaptcha/api/siteverify?secret=${RECAPTCHA_SITE_SECRET}&response=${token}`, { method: HttpMethod.POST });
@@ -12,13 +10,27 @@ async function validateCaptcha(token: string) {
 	return data;
 }
 
-function buildPositions(guess: string, lookup: string[]) {
-	return guess.split("").reduce((acc, letter, index) => {
-		if (lookup[index] === letter) acc.push({ type: CircleType.correct });
-		else if (lookup.includes(letter)) acc.push({ type: CircleType.wrong_position });
-		else acc.push({ type: CircleType.incorrect });
+function validateGuess(guess: string, lookup: PasswordLookup) {
+	const positions = guess.split("").reduce((acc, letter, index) => {
+		const match = lookup[letter];
+		if (!match) {
+			acc.push({ type: CircleType.incorrect });
+			return acc;
+		}
+		if (match.length === 1) {
+			if (match[0] === index) acc.push({ type: CircleType.correct });
+			else acc.push({ type: CircleType.wrong_position });
+			delete lookup[letter];
+			return acc;
+		}
+		if (match[0] === index) {
+			acc.push({ type: CircleType.correct });
+		}
+		else acc.push({ type: CircleType.wrong_position });
+		lookup[letter].shift();
 		return acc;
 	}, [] as Guesses[]);
+	return positions;
 }
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
@@ -36,7 +48,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
 				correct: false,
 				hash: (attempt + 1) >= 10 ? hash(password) : "",
 				password: "",
-				positions: buildPositions(guess, lookup)
+				positions: validateGuess(guess, lookup)
 			}
 		});
 		return res.status(200).json({
@@ -45,7 +57,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
 				correct: true,
 				hash: hash(password),
 				password: "",
-				positions: Array.from({ length: lookup.length }).map(() => {
+				positions: Array.from({ length: PASSWORD_LENGTH }).map(() => {
 					return { type: CircleType.correct };
 				})
 			}

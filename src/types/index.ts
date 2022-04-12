@@ -1,3 +1,9 @@
+export type RequestBody = { token: string, password: string, attempt: number };
+
+export type PasswordLookup = {
+	[key: string]: number[]
+}
+
 export enum CircleType {
 	correct,
 	incorrect,
