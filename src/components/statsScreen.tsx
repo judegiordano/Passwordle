@@ -42,7 +42,7 @@ export function StatsScreen({
 				</DialogContent>
 				<Divider />
 				<DialogActions>
-					<Button autoFocus>
+					<Button>
 						share
 					</Button>
 				</DialogActions>
