@@ -4,10 +4,10 @@ import { persist } from "zustand/middleware";
 
 import { storageEngine } from "./engine";
 
-type Timestamp = string | Date | null
+type Timestamp = Date | null
 
 type UseTimestamp = {
-	timestampCache: string | Date | null
+	timestampCache: Date | null
 	updateTimestampCache: (t: Timestamp) => void
 	clearTimestampCache: () => void
 }

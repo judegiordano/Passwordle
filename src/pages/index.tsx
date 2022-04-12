@@ -7,7 +7,7 @@ import FormControl from "@mui/material/FormControl";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import Button from "@mui/material/Button";
-import { DialogContentText } from "@mui/material";
+import DialogContentText from "@mui/material/DialogContentText";
 
 import { ReCaptcha } from "@components/captcha";
 import { useStorageStore, Storage } from "@store/useStorage";
