@@ -49,7 +49,7 @@ export function StatsScreen({
 			const title = `Passwordle for ${new Date(time).toLocaleDateString()}`;
 			const data = `${title}\n${NEXT_PUBLIC_DOMAIN}\n${score}`;
 			navigator.share?.({ text: data });
-			navigator.clipboard.writeText(data);
+			// navigator.clipboard.writeText(data);
 			toast.success("score copied!");
 		} catch (error) {
 			toast.error("share failed");
